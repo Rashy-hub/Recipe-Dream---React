@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    scroll-behavior: smooth;
+}
+.body-bg {
+    @apply bg-slate-900 font-sans text-slate-100 w-full min-h-[100vh] overflow-x-hidden;
+}
+.navlink {
+    @apply transition-colors duration-300 font-special font-bold text-2xl pb-1;
+}
+
+.navlink[data-theme='light'] {
+    @apply text-slate-900 hover:text-red-500;
+}
+.navlink[data-theme='dark'] {
+    @apply text-amber-500 hover:text-amber-100;
+}
+
+.navlink-active[data-theme='light'] {
+    @apply text-amber-500 border-b-2 border-slate-900;
+}
+.navlink-active[data-theme='dark'] {
+    @apply text-amber-300 border-b-2 border-white;
+}
+div[data-theme='light'] {
+    @apply bg-rose-200 text-slate-900;
+}
+
+div[data-theme='dark'] {
+    @apply bg-slate-900 text-slate-100;
+}
+
+h1[data-theme='light'] {
+    @apply text-slate-900;
+}
+h1[data-theme='dark'] {
+    @apply text-slate-100;
+}
+header[data-theme='dark'] {
+    @apply bg-slate-900 text-slate-100  border-slate-100;
+}
+header[data-theme='light'] {
+    @apply bg-transparent text-slate-900  border-slate-900;
+}
