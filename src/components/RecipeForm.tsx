@@ -1,33 +1,71 @@
 import React from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form'
+
+interface Ingredient {
+    name: string
+    amount: string
+    unit?: string
+    original?: string
+}
+
+interface RecipeFormData {
+    title: string
+    description: string
+    coverPicture: FileList | null
+    servings: string
+    readyInMinutes: string
+    extendedIngredients: Ingredient[]
+}
 
 interface RecipeFormProps {
-    addRecipeToMyRecipes: (recipe: any) => void
+    addRecipeToMyRecipes: (recipe: RecipeFormData) => void
 }
-const RecipeForm = ({ addRecipeToMyRecipes }: RecipeFormProps) => {
+
+const RecipeForm: React.FC<RecipeFormProps> = ({ addRecipeToMyRecipes }) => {
     const {
         control,
         handleSubmit,
         register,
         formState: { errors },
-    } = useForm({
-        defaultValues: {
-            title: '',
-            description: '',
-            cover_image: null,
-            servings: 1,
-            extendedIngredients: [{ name: '', quantity: '', unit: '' }],
-        },
-    })
+    } = useForm<RecipeFormData>()
 
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'extendedIngredients',
     })
 
-    const onSubmit = (data: any) => {
-        console.log(data)
-        addRecipeToMyRecipes(data)
+    const onSubmit: SubmitHandler<RecipeFormData> = (data) => {
+        // Vérification des données
+        console.log('Vérification des données du formulaire:')
+        console.log('Titre:', data.title)
+        console.log('Description:', data.description)
+        console.log('Image de couverture:', data.coverPicture?.[0])
+        console.log('Portions:', data.servings)
+        console.log('Ingrédients:', data.extendedIngredients)
+        console.log('Temps de preparation:', data.readyInMinutes)
+
+        // Vérification des fichiers (s'ils existent)
+        if (data.coverPicture && data.coverPicture.length > 0) {
+            console.log('Fichier sélectionné:', data.coverPicture[0])
+        } else {
+            console.error('Aucun fichier sélectionné')
+        }
+        // Ajout des champs manquants
+        const newData = {
+            ...data,
+            cover_image: {
+                public_id: '', // vous pouvez laisser cela vide ou ajouter une valeur par défaut
+                url: '', // vous pouvez laisser cela vide ou ajouter une valeur par défaut
+            },
+            ingredients: data.extendedIngredients.map((ingredient) => ({
+                name: ingredient.name,
+                amount: ingredient.amount,
+                unit: ingredient.unit,
+            })),
+        }
+
+        // Appel à la fonction pour ajouter la recette
+        addRecipeToMyRecipes(newData)
     }
 
     return (
@@ -50,10 +88,10 @@ const RecipeForm = ({ addRecipeToMyRecipes }: RecipeFormProps) => {
                     <label className="block text-gray-700">Image de couverture</label>
                     <input
                         type="file"
-                        {...register('cover_image', { required: 'Image de couverture est requise' })}
+                        {...register('coverPicture', { required: 'Image de couverture est requise' })}
                         className="w-full p-2 border rounded"
                     />
-                    {errors.cover_image && <p className="text-red-500">{errors.cover_image.message}</p>}
+                    {errors.coverPicture && <p className="text-red-500">{errors.coverPicture.message}</p>}
                 </div>
 
                 <div className="mb-4">
@@ -66,13 +104,34 @@ const RecipeForm = ({ addRecipeToMyRecipes }: RecipeFormProps) => {
                     />
                     {errors.servings && <p className="text-red-500">{errors.servings.message}</p>}
                 </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700">Temps de preparation</label>
+                    <input
+                        type="number"
+                        {...register('readyInMinutes', { required: 'Le temps de preparation est requis', min: 1 })}
+                        className="w-full p-2 border rounded"
+                        min="1"
+                    />
+                    {errors.readyInMinutes && <p className="text-red-500">{errors.readyInMinutes.message}</p>}
+                </div>
 
                 <h3 className="text-xl font-semibold mb-2 font-inter">Ingrédients</h3>
                 {fields.map((item, index) => (
                     <div key={item.id} className="flex items-center mb-2">
                         <input
                             type="text"
-                            {...register(`extendedIngredients[${index}].name`, { required: "Nom de l'ingrédient est requis" })}
+                            {...register(`extendedIngredients.${index}.original`)}
+                            placeholder="Description complète"
+                            className="w-full p-2 border rounded"
+                        />
+                        {errors.extendedIngredients?.[index]?.original && (
+                            <p className="text-red-500">{errors.extendedIngredients[index].original?.message}</p>
+                        )}
+                        <input
+                            type="text"
+                            {...register(`extendedIngredients.${index}.name`, {
+                                required: "Nom de l'ingrédient est requis",
+                            })}
                             placeholder="Nom de l'ingrédient"
                             className="w-1/3 p-2 border rounded mr-2"
                         />
@@ -81,18 +140,20 @@ const RecipeForm = ({ addRecipeToMyRecipes }: RecipeFormProps) => {
                         )}
 
                         <input
-                            type="number"
-                            {...register(`extendedIngredients[${index}].amount`, { required: 'Quantité est requise', min: 0 })}
+                            type="text"
+                            {...register(`extendedIngredients.${index}.amount`, {
+                                required: 'Quantité est requise',
+                            })}
                             placeholder="Quantité"
                             className="w-1/4 p-2 border rounded mr-2"
                         />
-                        {errors.extendedIngredients?.[index]?.quantity && (
-                            <p className="text-red-500">{errors.extendedIngredients[index].quantity?.message}</p>
+                        {errors.extendedIngredients?.[index]?.amount && (
+                            <p className="text-red-500">{errors.extendedIngredients[index].amount?.message}</p>
                         )}
 
                         <input
                             type="text"
-                            {...register(`extendedIngredients[${index}].unit`)}
+                            {...register(`extendedIngredients.${index}.unit`)}
                             placeholder="Unité"
                             className="w-1/4 p-2 border rounded mr-2"
                         />
@@ -104,7 +165,7 @@ const RecipeForm = ({ addRecipeToMyRecipes }: RecipeFormProps) => {
                 ))}
                 <button
                     type="button"
-                    onClick={() => append({ name: '', quantity: '', unit: '' })}
+                    onClick={() => append({ name: '', amount: '', unit: '' })}
                     className="text-blue-500 hover:text-blue-700 mb-4 mr-5"
                 >
                     Ajouter un ingrédient

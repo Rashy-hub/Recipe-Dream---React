@@ -16,7 +16,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onOpenModal }) => {
         mutationKey: ['deleteRecipe'],
         mutationFn: (id: string) => fetchRecipes.deleteRecipes(id),
         onSuccess: () => {
-            queryClient.invalidateQueries(['recipes'])
+            queryClient.invalidateQueries({ queryKey: ['recipes'] })
         },
         onError: (mutationError) => {
             console.error('Error while deleting recipe:', mutationError)

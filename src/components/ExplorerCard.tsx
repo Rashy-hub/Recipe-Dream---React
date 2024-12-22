@@ -1,7 +1,7 @@
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'
 import { FaCheckCircle, FaClock, FaUsers } from 'react-icons/fa'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Loader from './ux/Loader'
 import { useAuth } from '../contexts/AuthContext'
 import { ExplorerIngredient, ExplorerRecipe } from '../schemas/explorerSchema'

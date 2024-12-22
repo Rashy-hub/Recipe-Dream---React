@@ -25,6 +25,7 @@ const RegisterPage: React.FC = () => {
     const mutation = useMutation({
         mutationFn: fetchAuth.register,
         onSuccess: (data: RegisterResponse) => {
+            console.log(data)
             navigate('/app/login')
         },
     })

@@ -26,15 +26,13 @@ export const ExplorerIngredientsSchema = z.object({
 })
 
 export const ExplorerSchema = z.object({
-    id: z.string(), // ID unique de la recette
-
+    spoonacularId: z.string(), // ID unique de la recette
     title: z.string(), // Titre de la recette
     summary: z.string(), // Description de la recette
-    readyInMinutes: z.number(), // Duree de la recette
-    servings: z.number(), // Nombre de personnes
+    readyInMinutes: z.string(), // Duree de la recette
+    servings: z.string(), // Nombre de personnes
     image: z.string().url(), // URL de l'image de la recette
     extendedIngredients: z.array(ExplorerIngredientsSchema).optional(),
-    __v: z.number(), // Version du document
 })
 
 /*  {

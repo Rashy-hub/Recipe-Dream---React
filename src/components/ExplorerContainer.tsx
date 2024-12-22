@@ -19,7 +19,7 @@ const ExplorerContainer: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [modalRecipe, setModalRecipe] = useState<ExplorerRecipe>({} as ExplorerRecipe)
 
-    const { data, isError, error, isLoading } = useQuery({
+    const { data, isError, error } = useQuery({
         queryKey: ['explorers', offset, searchQuery],
         queryFn: () => fetchSpoonacular.getRecipes({ query: searchQuery, offset }),
     })
@@ -43,10 +43,9 @@ const ExplorerContainer: React.FC = () => {
                 title: recipe.title,
                 cover_image: { url: recipe.image },
                 description: recipe.summary,
-                readyInMinutes: recipe.readyInMinutes,
+                readyInMinutes: recipe.readyInMinutes || '0',
                 servings: recipe.servings,
-                __v: 0,
-                _id: recipe.id,
+                _id: recipe.spoonacularId,
                 extendedIngredients: recipe.extendedIngredients,
             })
         } else {
@@ -117,7 +116,7 @@ const ExplorerContainer: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-10">
                 {recipes.map((recipe: ExplorerRecipe) => (
                     <ExplorerCard
-                        key={recipe.id}
+                        key={recipe.spoonacularId}
                         recipe={recipe}
                         onAddRecipe={(liked) => addRecipeToMyRecipes(recipe, liked)}
                         onOpenModal={() => openModal(recipe)}

@@ -14,7 +14,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import fetchRecipes from '../services/fetchRecipes'
 import RecipeCard from '../components/RecipeCard'
 import Modal from 'react-modal'
-import { Recipe, RecipeFormData } from '../schemas/recipeSchema'
+import { Recipe } from '../schemas/recipeSchema'
 import RecipeForm from '../components/RecipeForm'
 
 const DashBoardPage: React.FC = () => {
@@ -37,7 +37,29 @@ const DashBoardPage: React.FC = () => {
 
     const { mutate: addRecipe } = useMutation({
         mutationKey: ['addRecipe'],
-        mutationFn: (recipe: Recipe) => fetchRecipes.postRecipe(recipe),
+        mutationFn: (recipe: {
+            title: string
+            description: string
+            readyInMinutes: string
+            servings: string
+            coverPicture: FileList | null
+
+            extendedIngredients: {
+                name: string
+                amount: string
+                unit: string
+                original: string
+            }[]
+            cover_image: {
+                public_id: string
+                url: string
+            }
+            ingredients: {
+                name: string
+                amount: string
+                unit: string
+            }[]
+        }) => fetchRecipes.postRecipe(recipe),
         onSuccess: () => {
             alert('Recipe added to your recipes!')
         },
@@ -46,20 +68,12 @@ const DashBoardPage: React.FC = () => {
         },
     })
 
-    const addRecipeToMyRecipes = (recipe: Recipe) => {
+    const addRecipeToMyRecipes = (recipe) => {
         //Here I mutate the API
         console.log('DATA FROM THE FORM')
-        console.log(JSON.stringify(recipe))
-        addRecipe({
-            title: recipe.title,
-            cover_image: { url: recipe.cover_image?.url },
-            description: recipe.description,
-            readyInMinutes: recipe.readyInMinutes,
-            servings: recipe.servings,
-            __v: 0,
-            _id: recipe._id,
-            extendedIngredients: recipe.extendedIngredients,
-        })
+        console.log(JSON.stringify(recipe, null, 2))
+        console.log('END DATA FROM THE FORM')
+        addRecipe(recipe)
     }
 
     const handleThemeToggle = () => {

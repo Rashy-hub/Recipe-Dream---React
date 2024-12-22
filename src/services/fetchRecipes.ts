@@ -1,4 +1,4 @@
-import { ExplorerIngredient } from '../schemas/explorerSchema'
+import { Recipe } from '../schemas/recipeSchema'
 import urlBuilder from '../utils/urlBuilder'
 
 const fetchRecipes = {
@@ -49,15 +49,78 @@ const fetchRecipes = {
             throw new Error((error as Error).message)
         }
     },
-
+    /*     {
+        "title": "Coucous",
+        "description": "super couscous de mamie",
+        "coverPicture": {
+            "0": {}
+        },
+        "servings": "2",
+        "readyInMinutes": "60",
+        "extendedIngredients": [
+            {
+                "name": "Oeufs",
+                "amount": "2",
+                "unit": "unité",
+                "original": "2 cuillére à soupe de soupe"
+            }
+        ],
+        "cover_image": {
+            "public_id": "",
+            "url": ""
+        },
+        "ingredients": [
+            {
+                "name": "Oeufs",
+                "amount": "2",
+                "unit": "unité"
+            }
+        ]
+    } */
+    /*{
+    title: string;
+    description: string;
+    coverPicture: Record<string, object>; // Index signature avec une clé de type string et une valeur de type object
+    servings: string; // Nombre de portions, représenté ici comme une chaîne
+    readyInMinutes: string; // Temps de préparation, en minutes, représenté ici comme une chaîne
+    extendedIngredients: {
+        name: string;
+        amount: string;
+        unit: string;
+        original: string; // Description complète de l'ingrédient
+    }[];
+    cover_image: {
+        public_id: string;
+        url: string;
+    };
+    ingredients: {
+        name: string;
+        amount: string;
+        unit: string;
+    }[];
+} */
     postRecipe: async (recipeData: {
         title: string
         description: string
-        coverPicture: File
         readyInMinutes: string
         servings: string
-        cover_image: { url: string }
-        extendedIngredients: ExplorerIngredient[]
+        coverPicture: FileList | null
+
+        extendedIngredients: {
+            name: string
+            amount: string
+            unit: string
+            original: string
+        }[]
+        cover_image: {
+            public_id: string
+            url: string
+        }
+        ingredients: {
+            name: string
+            amount: string
+            unit: string
+        }[]
     }) => {
         try {
             const token = sessionStorage.getItem('authToken')
@@ -79,7 +142,7 @@ const fetchRecipes = {
             formData.append('title', recipeData.title)
             formData.append('description', recipeData.description)
             //formData.append('coverPicture', recipeData.coverPicture)
-            formData.append('coverPicture', recipeData.cover_image[0]) // Ajoutez le fichier à l'objet FormData
+            if (recipeData.coverPicture) formData.append('coverPicture', recipeData.coverPicture[0]) // Ajoutez le fichier à l'objet FormData
             formData.append('readyInMinutes', recipeData.readyInMinutes)
             formData.append('servings', recipeData.servings)
 
@@ -162,15 +225,7 @@ const fetchRecipes = {
         }
     },
 
-    postExplorer: async (recipeData: {
-        title: string
-        description: string
-        readyInMinutes: string
-        servings: string
-        cover_image: { url: string }
-
-        extendedIngredients: ExplorerIngredient[]
-    }) => {
+    postExplorer: async (recipeData: Recipe) => {
         try {
             const token = sessionStorage.getItem('authToken')
             if (!token) {
@@ -194,7 +249,7 @@ const fetchRecipes = {
             formData.append('servings', recipeData.servings)
             formData.append('cover_image[url]', recipeData.cover_image.url)
 
-            recipeData.extendedIngredients.forEach((ingredient, index) => {
+            recipeData.extendedIngredients?.forEach((ingredient, index) => {
                 formData.append(`extendedIngredients[${index}][name]`, ingredient.name)
                 formData.append(`extendedIngredients[${index}][original]`, ingredient.original)
                 formData.append(`extendedIngredients[${index}][unit]`, ingredient.unit)

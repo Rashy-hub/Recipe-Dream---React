@@ -38,7 +38,7 @@ const fetchAuth = {
         }
     },
 
-    register: async (userData: User) => {
+    register: async (userData: { username: string; email: string; password: string }) => {
         try {
             const buildedURL = urlBuilder({
                 baseURL: baseUrl,

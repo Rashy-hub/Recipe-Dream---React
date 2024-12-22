@@ -7,15 +7,13 @@ const RecipeSchema = z.object({
     //userId: z.string(), // ID de l'utilisateur ayant créé la recette
     title: z.string(), // Titre de la recette
     description: z.string(), // Description de la recette
-    readyInMinutes: z.number().optional(), // Duree de la recette
+    readyInMinutes: z.string(), // Duree de la recette
     extendedIngredients: z.array(ExplorerIngredientsSchema).optional(),
-    servings: z.number().optional(), // Nombre de personnes servies
+    servings: z.string(), // Nombre de personnes servies
     cover_image: z.object({
         public_id: z.string().nullable().optional(),
         url: z.string().url(),
     }),
-
-    __v: z.number(), // Version du document
 })
 
 // Schema pour les données envoyées via le formulaire (POST)
@@ -47,6 +45,7 @@ const RecipeResponseSchema = z.object({
 
 // Inference des types avec TypeScript
 export type Recipe = z.infer<typeof RecipeSchema> // Type d'une recette complète
+
 export type RecipeFormData = z.infer<typeof RecipeFormDataSchema> // Type des données pour le formulaire
 export type RecipeResponse = z.infer<typeof RecipeResponseSchema> // Type de la réponse de l'API
 
